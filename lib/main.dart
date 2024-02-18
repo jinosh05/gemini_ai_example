@@ -46,34 +46,49 @@ class _ChatPageState extends State<ChatPage> {
       ),
       body: Column(
         children: [
-          Expanded(
-            child: ListView.separated(
-              itemCount: listDatas.length,
-              separatorBuilder: (BuildContext context, int index) {
-                return const SizedBox(
-                  height: 10,
-                );
-              },
-              itemBuilder: (BuildContext context, int index) {
-                return Align(
-                  alignment: index.isOdd
-                      ? Alignment.centerLeft
-                      : Alignment.centerRight,
-                  child: Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(
-                        listDatas[index],
-                        style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                              color: index.isOdd ? Colors.yellow : Colors.blue,
-                            ),
-                      ),
+          listDatas.isEmpty
+              ? Expanded(
+                  child: Center(
+                    child: Text(
+                      "Search Something Over Here !!",
+                      style: Theme.of(context).textTheme.headlineMedium!,
+                      textAlign: TextAlign.center,
                     ),
                   ),
-                );
-              },
-            ),
-          ),
+                )
+              : Expanded(
+                  child: ListView.separated(
+                    itemCount: listDatas.length,
+                    separatorBuilder: (BuildContext context, int index) {
+                      return const SizedBox(
+                        height: 10,
+                      );
+                    },
+                    itemBuilder: (BuildContext context, int index) {
+                      return Align(
+                        alignment: index.isOdd
+                            ? Alignment.centerLeft
+                            : Alignment.centerRight,
+                        child: Card(
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(
+                              listDatas[index],
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium!
+                                  .copyWith(
+                                    color: index.isOdd
+                                        ? Colors.yellow
+                                        : Colors.blue,
+                                  ),
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
           ValueListenableBuilder(
             valueListenable: isLoading,
             builder: (BuildContext context, dynamic value, Widget? child) {
