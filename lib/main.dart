@@ -11,8 +11,13 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: ChatPage(),
+    return MaterialApp(
+      theme: ThemeData.dark().copyWith(
+        cardTheme: const CardTheme(
+          color: Colors.black,
+        ),
+      ),
+      home: const ChatPage(),
     );
   }
 }
@@ -29,7 +34,7 @@ class ChatPage extends StatefulWidget {
 class _ChatPageState extends State<ChatPage> {
   TextEditingController controller = TextEditingController();
   List<String> listDatas = [];
-  bool isLoading = false;
+  ValueNotifier<bool> isLoading = ValueNotifier(false);
 
   @override
   Widget build(BuildContext context) {
@@ -60,9 +65,9 @@ class _ChatPageState extends State<ChatPage> {
               onTap: () async {
                 if (controller.text.isNotEmpty) {
                   listDatas.add(controller.text);
-                  setState(() {
-                    isLoading = true;
-                  });
+
+                  isLoading.value = true;
+
                   final model = GenerativeModel(
                     model: 'gemini-pro',
                     apiKey: geminiApiKey,
@@ -70,13 +75,16 @@ class _ChatPageState extends State<ChatPage> {
 
                   final prompt = controller.text;
                   final content = [Content.text(prompt)];
+                  controller.clear();
                   final response = await model.generateContent(content);
+
                   listDatas.add(response.text ?? "");
-                  setState(() {
-                    isLoading = false;
-                  });
+
+                  isLoading.value = false;
+
                   controller.clear();
                 }
+                setState(() {});
               },
               child: const Icon(
                 Icons.send,
@@ -87,7 +95,44 @@ class _ChatPageState extends State<ChatPage> {
           ],
         ),
       ),
-      body: ElevatedButton(onPressed: () async {}, child: const Text("Hello")),
+      body: Column(
+        children: [
+          Expanded(
+            child: ListView.separated(
+              itemCount: listDatas.length,
+              separatorBuilder: (BuildContext context, int index) {
+                return const SizedBox(
+                  height: 10,
+                );
+              },
+              itemBuilder: (BuildContext context, int index) {
+                return Align(
+                  alignment: index.isOdd
+                      ? Alignment.centerLeft
+                      : Alignment.centerRight,
+                  child: Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        listDatas[index],
+                        style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                              color: index.isOdd ? Colors.yellow : Colors.blue,
+                            ),
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+          ValueListenableBuilder(
+            valueListenable: isLoading,
+            builder: (BuildContext context, dynamic value, Widget? child) {
+              return Container();
+            },
+          ),
+        ],
+      ),
     );
   }
 }
