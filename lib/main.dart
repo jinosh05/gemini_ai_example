@@ -43,58 +43,58 @@ class _ChatPageState extends State<ChatPage> {
       appBar: AppBar(
         title: const Text('Gemini AI Generator'),
       ),
-      bottomSheet: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Row(
-          children: [
-            Expanded(
-              child: TextField(
-                controller: controller,
-                decoration: InputDecoration(
-                  contentPadding: const EdgeInsets.all(10),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(25),
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(
-              width: 5,
-            ),
-            InkWell(
-              onTap: () async {
-                if (controller.text.isNotEmpty) {
-                  listDatas.add(controller.text);
+      // bottomSheet: Padding(
+      //   padding: const EdgeInsets.all(8.0),
+      //   child: Row(
+      //     children: [
+      //       Expanded(
+      //         child: TextField(
+      //           controller: controller,
+      //           decoration: InputDecoration(
+      //             contentPadding: const EdgeInsets.all(10),
+      //             border: OutlineInputBorder(
+      //               borderRadius: BorderRadius.circular(25),
+      //             ),
+      //           ),
+      //         ),
+      //       ),
+      //       const SizedBox(
+      //         width: 5,
+      //       ),
+      //       InkWell(
+      //         onTap: () async {
+      //           if (controller.text.isNotEmpty) {
+      //             listDatas.add(controller.text);
 
-                  isLoading.value = true;
+      //             isLoading.value = true;
 
-                  final model = GenerativeModel(
-                    model: 'gemini-pro',
-                    apiKey: geminiApiKey,
-                  );
+      //             final model = GenerativeModel(
+      //               model: 'gemini-pro',
+      //               apiKey: geminiApiKey,
+      //             );
 
-                  final prompt = controller.text;
-                  final content = [Content.text(prompt)];
-                  controller.clear();
-                  final response = await model.generateContent(content);
+      //             final prompt = controller.text;
+      //             final content = [Content.text(prompt)];
+      //             controller.clear();
+      //             final response = await model.generateContent(content);
 
-                  listDatas.add(response.text ?? "");
+      //             listDatas.add(response.text ?? "");
 
-                  isLoading.value = false;
+      //             isLoading.value = false;
 
-                  controller.clear();
-                }
-                setState(() {});
-              },
-              child: const Icon(
-                Icons.send,
-                size: 25,
-                color: Colors.blue,
-              ),
-            )
-          ],
-        ),
-      ),
+      //             controller.clear();
+      //           }
+      //           setState(() {});
+      //         },
+      //         child: const Icon(
+      //           Icons.send,
+      //           size: 25,
+      //           color: Colors.blue,
+      //         ),
+      //       )
+      //     ],
+      //   ),
+      // ),
       body: Column(
         children: [
           Expanded(
@@ -131,8 +131,68 @@ class _ChatPageState extends State<ChatPage> {
               return Container();
             },
           ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: controller,
+                    onEditingComplete: () async {
+                      _searchContent();
+                    },
+                    decoration: InputDecoration(
+                      hintText: "Enter a Prompt ...",
+                      contentPadding: const EdgeInsets.all(10),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(25),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(
+                  width: 5,
+                ),
+                InkWell(
+                  onTap: () async {
+                    await _searchContent();
+                  },
+                  child: const Icon(
+                    Icons.send,
+                    size: 25,
+                    color: Colors.blue,
+                  ),
+                )
+              ],
+            ),
+          )
         ],
       ),
     );
+  }
+
+  Future<void> _searchContent() async {
+    if (controller.text.isNotEmpty) {
+      listDatas.add(controller.text);
+
+      isLoading.value = true;
+
+      final model = GenerativeModel(
+        model: 'gemini-pro',
+        apiKey: geminiApiKey,
+      );
+
+      final prompt = controller.text;
+      final content = [Content.text(prompt)];
+      controller.clear();
+      final response = await model.generateContent(content);
+
+      listDatas.add(response.text ?? "");
+
+      isLoading.value = false;
+
+      controller.clear();
+    }
+    setState(() {});
   }
 }
