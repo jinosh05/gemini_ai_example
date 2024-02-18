@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gemini_ai_example/env.dart';
+import 'package:gemini_ai_example/three_bounce.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 
 void main() async {
@@ -43,58 +44,6 @@ class _ChatPageState extends State<ChatPage> {
       appBar: AppBar(
         title: const Text('Gemini AI Generator'),
       ),
-      // bottomSheet: Padding(
-      //   padding: const EdgeInsets.all(8.0),
-      //   child: Row(
-      //     children: [
-      //       Expanded(
-      //         child: TextField(
-      //           controller: controller,
-      //           decoration: InputDecoration(
-      //             contentPadding: const EdgeInsets.all(10),
-      //             border: OutlineInputBorder(
-      //               borderRadius: BorderRadius.circular(25),
-      //             ),
-      //           ),
-      //         ),
-      //       ),
-      //       const SizedBox(
-      //         width: 5,
-      //       ),
-      //       InkWell(
-      //         onTap: () async {
-      //           if (controller.text.isNotEmpty) {
-      //             listDatas.add(controller.text);
-
-      //             isLoading.value = true;
-
-      //             final model = GenerativeModel(
-      //               model: 'gemini-pro',
-      //               apiKey: geminiApiKey,
-      //             );
-
-      //             final prompt = controller.text;
-      //             final content = [Content.text(prompt)];
-      //             controller.clear();
-      //             final response = await model.generateContent(content);
-
-      //             listDatas.add(response.text ?? "");
-
-      //             isLoading.value = false;
-
-      //             controller.clear();
-      //           }
-      //           setState(() {});
-      //         },
-      //         child: const Icon(
-      //           Icons.send,
-      //           size: 25,
-      //           color: Colors.blue,
-      //         ),
-      //       )
-      //     ],
-      //   ),
-      // ),
       body: Column(
         children: [
           Expanded(
@@ -128,7 +77,13 @@ class _ChatPageState extends State<ChatPage> {
           ValueListenableBuilder(
             valueListenable: isLoading,
             builder: (BuildContext context, dynamic value, Widget? child) {
-              return Container();
+              if (!value) {
+                return const SizedBox();
+              }
+              return const SpinKitThreeBounce(
+                color: Colors.blue,
+                size: 30,
+              );
             },
           ),
           Padding(
@@ -153,16 +108,27 @@ class _ChatPageState extends State<ChatPage> {
                 const SizedBox(
                   width: 5,
                 ),
-                InkWell(
-                  onTap: () async {
-                    await _searchContent();
+                ValueListenableBuilder(
+                  valueListenable: isLoading,
+                  builder:
+                      (BuildContext context, dynamic value, Widget? child) {
+                    if (value) {
+                      return const CircularProgressIndicator(
+                        color: Colors.blue,
+                      );
+                    }
+                    return InkWell(
+                      onTap: () async {
+                        await _searchContent();
+                      },
+                      child: const Icon(
+                        Icons.send,
+                        size: 25,
+                        color: Colors.blue,
+                      ),
+                    );
                   },
-                  child: const Icon(
-                    Icons.send,
-                    size: 25,
-                    color: Colors.blue,
-                  ),
-                )
+                ),
               ],
             ),
           )
